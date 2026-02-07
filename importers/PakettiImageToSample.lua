@@ -113,7 +113,7 @@ function export_image_to_sample(waveform_data, image_path)
   return true
 end
 
--- File import hook for image formats
+-- File import hook for image formats (also exposed as global pakettiImageToSample for menu entries)
 local function image_import_hook(file_path)
   -- Handle instrument creation based on preference
   if not renoise.tool().preferences.pakettiOverwriteCurrent.value then
@@ -132,6 +132,9 @@ local function image_import_hook(file_path)
   -- Export to sample
   return export_image_to_sample(waveform_data, file_path)
 end
+
+-- Expose as global for main.lua menu entry
+pakettiImageToSample = image_import_hook
 
 -- Create integration for image formats
 local image_integration = {

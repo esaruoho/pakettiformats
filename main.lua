@@ -506,7 +506,7 @@ renoise.tool():add_menu_entry {
   name = "Main Menu:File:Paketti Formats:Import .ITI (Impulse Tracker Instrument)...",
   invoke = function()
     local f = renoise.app():prompt_for_filename_to_read({"*.iti"}, "Select ITI to import")
-    if f and f ~= "" then iti_loadsample(f) end
+    if f and f ~= "" then iti_loadinstrument(f) end
   end
 }
 
