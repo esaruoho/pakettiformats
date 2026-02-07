@@ -20,6 +20,7 @@ require "importers/PakettiOctaCycle"
 require "importers/PakettiDigitakt"
 require "importers/PakettiITIExport"
 require "importers/PakettiWTImport"
+require "importers/PakettiMODLoader"
 if renoise.API_VERSION >= 6.2 then
   require "importers/PakettiImageToSample"
 end

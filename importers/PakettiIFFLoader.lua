@@ -199,10 +199,7 @@ local function loadIFFSample(file_path)
   sample.name = name
 
   local load_ok, load_err = pcall(function()
-    local bit_depth = (#buffer_data > 0 and math.floor(#buffer_data / #buffer_data)) and 
-                      ((lower:match("%.16sv$") and 16) or 8) or 8
-    -- Actually pick bit-depth from form_type:
-    load_bit_depth = (lower:match("%.16sv$") and 16) or 8
+    local load_bit_depth = (lower:match("%.16sv$") and 16) or 8
 
     sample.sample_buffer:create_sample_data(
       sample_rate, load_bit_depth, 1, #buffer_data)
@@ -1560,7 +1557,7 @@ function batchConvertIFFToWAV()
       local output_path = change_extension(file_path, "wav")
       
       local write_ok, write_err = pcall(function()
-        write_wav_file(output_path, buffer_data, sample_rate, 16)
+        write_wav_file(output_path, buffer_data, sample_rate)
       end)
 
       if write_ok then
