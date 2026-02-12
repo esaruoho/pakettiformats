@@ -1,31 +1,18 @@
 ---@diagnostic disable: lowercase-global
 
--- Safe stubs for AutoSamplify monitoring functions from the parent Paketti tool.
--- When paketti-importer runs standalone (without the main Paketti tool installed),
--- these functions don't exist and would crash every import hook.
--- The stubs return nil / do nothing, which is the correct behavior:
--- there's no AutoSamplify monitoring to disable if Paketti isn't loaded.
-if not PakettiTemporarilyDisableNewSampleMonitoring then
-  function PakettiTemporarilyDisableNewSampleMonitoring()
-    return nil
-  end
+function PakettiTemporarilyDisableNewSampleMonitoring()
+  return nil
 end
 
-if not PakettiRestoreNewSampleMonitoring then
-  function PakettiRestoreNewSampleMonitoring(_state)
-    -- no-op
-  end
+function PakettiRestoreNewSampleMonitoring(_state)
 end
 
--- Safe stub for read_file from parent Paketti tool (used by loadnative for preset loading).
-if not read_file then
-  function read_file(filepath)
-    local f = io.open(filepath, "rb")
-    if not f then return nil end
-    local content = f:read("*a")
-    f:close()
-    return content
-  end
+function read_file(filepath)
+  local f = io.open(filepath, "rb")
+  if not f then return nil end
+  local content = f:read("*a")
+  f:close()
+  return content
 end
 
 function read_byte_from_memory(data, pos)
