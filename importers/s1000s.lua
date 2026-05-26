@@ -196,12 +196,14 @@ function load_it(fname, pan)
   local lsb_first = true
 
   local song = renoise.song()
-  song.selected_instrument:insert_sample_at(1)
-  local smp = renoise.song().selected_sample
+  local instr = song.selected_instrument
+  instr:insert_sample_at(1)
+  song.selected_sample_index = 1
+  local smp = instr.samples[1]
 
   local s_basename = fname:match("([^/\\]+)$") or "Akai Sample"
-  renoise.song().selected_instrument.name = s_basename
-  renoise.song().selected_sample.name = s_basename
+  instr.name = s_basename
+  smp.name = s_basename
 
   local f_in = io.open(fname, "rb")
   if f_in == nil then

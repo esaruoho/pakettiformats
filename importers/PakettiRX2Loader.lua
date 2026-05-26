@@ -120,14 +120,17 @@ function rx2_loadsample(filename)
   end
 
   local song = renoise.song()
-  local smp = song.selected_sample
-  
+  local instr = song.selected_instrument
+  if #instr.samples == 0 then instr:insert_sample_at(1) end
+  song.selected_sample_index = 1
+  local smp = instr.samples[1]
+
   -- Use the filename (minus the .rx2 extension) to create instrument name
   local rx2_filename_clean = filename:match("[^/\\]+$") or "RX2 Sample"
   local instrument_name = rx2_filename_clean:gsub("%.rx2$", "")
   local rx2_basename = filename:match("([^/\\]+)$") or "RX2 Sample"
-  renoise.song().selected_instrument.name = rx2_basename
-  renoise.song().selected_sample.name = rx2_basename
+  instr.name = rx2_basename
+  smp.name = rx2_basename
  
   -- Define paths for the output WAV file and the slice marker text file
   local TEMP_FOLDER = "/tmp"
