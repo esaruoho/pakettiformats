@@ -76,12 +76,6 @@ renoise.tool():add_menu_entry{name="--Instrument Box:Paketti..:Load .MOD as Samp
       pakettiLoadExeAsSample(file_path)
       paketti_toggle_signed_unsigned() end end}
 
-renoise.tool():add_menu_entry{name="Main Menu:Tools:Paketti..:Samples..:Load Samples from .MOD",invoke=function() load_samples_from_mod() end}
-renoise.tool():add_menu_entry{name="Sample Editor:Paketti..:Load Samples from .MOD",invoke=function() load_samples_from_mod() end}
-renoise.tool():add_menu_entry{name="Sample Navigator:Paketti..:Load Samples from .MOD",invoke=function() load_samples_from_mod() end}
-renoise.tool():add_menu_entry{name="Instrument Box:Paketti..:Load Samples from .MOD",invoke=function() load_samples_from_mod() end}
-
-
 -- helpers to build little-endian words/dwords for WAV header
 local function le_u16(n)
   return string.char(n % 256, math.floor(n/256) % 256)
@@ -92,6 +86,12 @@ local function le_u32(n)
   local b3 = math.floor(n/65536) % 256
   local b4 = math.floor(n/16777216) % 256
   return string.char(b1, b2, b3, b4)
+end
+
+-- big-endian 16-bit reader, 1-based
+local function read_be_u16(str, pos)
+  local b1,b2 = str:byte(pos,pos+1)
+  return b1*256 + b2
 end
 
 function load_samples_from_mod()
@@ -250,12 +250,10 @@ function load_samples_from_mod()
   renoise.app():show_status("All MOD samples loaded.")
 end
 
----
--- big-endian 16-bit reader, 1-based
-local function read_be_u16(str, pos)
-  local b1,b2 = str:byte(pos,pos+1)
-  return b1*256 + b2
-end
+renoise.tool():add_menu_entry{name="Main Menu:Tools:Paketti..:Samples..:Load Samples from .MOD",invoke=function() load_samples_from_mod() end}
+renoise.tool():add_menu_entry{name="Sample Editor:Paketti..:Load Samples from .MOD",invoke=function() load_samples_from_mod() end}
+renoise.tool():add_menu_entry{name="Sample Navigator:Paketti..:Load Samples from .MOD",invoke=function() load_samples_from_mod() end}
+renoise.tool():add_menu_entry{name="Instrument Box:Paketti..:Load Samples from .MOD",invoke=function() load_samples_from_mod() end}
 
 -- determine where in a 4-ch/31-sample .mod the sample data begins
 local function find_mod_sample_data_offset(data)
