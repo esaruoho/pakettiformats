@@ -47,35 +47,6 @@ renoise.tool():add_keybinding {name="Sample Editor:Paketti:Toggle Signed/Unsigne
 
 
 
-renoise.tool():add_menu_entry{name="--Main Menu:Tools:Paketti..:Samples..:Load .MOD as Sample",
-  invoke=function() 
-    local file_path = renoise.app():prompt_for_filename_to_read({"*.mod"}, "Select Any File to Load as Sample")
-    if file_path ~= "" then
-      pakettiLoadExeAsSample(file_path)
-      paketti_toggle_signed_unsigned() end end}
-
-renoise.tool():add_menu_entry{name="--Sample Editor:Paketti..:Load .MOD as Sample",
-  invoke=function() 
-    local file_path = renoise.app():prompt_for_filename_to_read({"*.mod"}, "Select Any File to Load as Sample")
-    if file_path ~= "" then
-      pakettiLoadExeAsSample(file_path)
-      paketti_toggle_signed_unsigned() end end}
-
-
-renoise.tool():add_menu_entry{name="--Sample Navigator:Paketti..:Load .MOD as Sample",invoke=function() 
-    local file_path = renoise.app():prompt_for_filename_to_read({"*.mod"}, "Select Any File to Load as Sample")
-    if file_path ~= "" then
-      pakettiLoadExeAsSample(file_path)
-      paketti_toggle_signed_unsigned() end end}
-
-
-renoise.tool():add_menu_entry{name="--Instrument Box:Paketti..:Load .MOD as Sample",
-  invoke=function() 
-    local file_path = renoise.app():prompt_for_filename_to_read({"*.mod"}, "Select Any File to Load as Sample")
-    if file_path ~= "" then
-      pakettiLoadExeAsSample(file_path)
-      paketti_toggle_signed_unsigned() end end}
-
 -- helpers to build little-endian words/dwords for WAV header
 local function le_u16(n)
   return string.char(n % 256, math.floor(n/256) % 256)
@@ -91,6 +62,7 @@ end
 -- big-endian 16-bit reader, 1-based
 local function read_be_u16(str, pos)
   local b1,b2 = str:byte(pos,pos+1)
+  if not b1 or not b2 then return 0 end
   return b1*256 + b2
 end
 
@@ -144,7 +116,7 @@ function load_samples_from_mod()
 
   -- channels from ID
   local id = data:sub(1081,1084)
-  local channel_map = { M_K=4, ["4CHN"]=4, ["6CHN"]=6, ["8CHN"]=8, ["FLT4"]=4, ["FLT8"]=8 }
+  local channel_map = { ["M.K."]=4, ["4CHN"]=4, ["6CHN"]=6, ["8CHN"]=8, ["FLT4"]=4, ["FLT8"]=8 }
   local channels = channel_map[id] or 4
 
   -- skip to sample data
@@ -189,9 +161,13 @@ function load_samples_from_mod()
       -- write to temp .wav
       local tmp = os.tmpname()..".wav"
       local wf  = io.open(tmp,"wb")
-      wf:write(header)
-      wf:write(unsigned)
-      wf:close()
+      if not wf then
+        renoise.app():show_status(("Could not write temp WAV for %q"):format(info.name))
+      else
+        wf:write(header)
+        wf:write(unsigned)
+        wf:close()
+      end
 
       -- apply Paketti defaults + insert instrument
       
@@ -358,6 +334,19 @@ function pakettiLoadExeAsSample(file_path)
   )
 end
 
+
+local function paketti_pick_mod_as_sample()
+  local file_path = renoise.app():prompt_for_filename_to_read({"*.mod"}, "Select Any File to Load as Sample")
+  if file_path ~= "" then
+    pakettiLoadExeAsSample(file_path)
+    paketti_toggle_signed_unsigned()
+  end
+end
+
+renoise.tool():add_menu_entry{name="--Main Menu:Tools:Paketti..:Samples..:Load .MOD as Sample",invoke=paketti_pick_mod_as_sample}
+renoise.tool():add_menu_entry{name="--Sample Editor:Paketti..:Load .MOD as Sample",invoke=paketti_pick_mod_as_sample}
+renoise.tool():add_menu_entry{name="--Sample Navigator:Paketti..:Load .MOD as Sample",invoke=paketti_pick_mod_as_sample}
+renoise.tool():add_menu_entry{name="--Instrument Box:Paketti..:Load .MOD as Sample",invoke=paketti_pick_mod_as_sample}
 
 if not renoise.tool():has_file_import_hook("sample", {"exe","dll","bin","sys","dylib"}) then
   renoise.tool():add_file_import_hook{category="sample",extensions={"exe","dll","bin","sys","dylib"},invoke=pakettiLoadExeAsSample}
